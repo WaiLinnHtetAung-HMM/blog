@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Blog;
+use App\Models\User;
+use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +17,25 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $blogs = Blog::with('category', 'author')->get();
+    
+    return view('blogs', compact('blogs'));
+});
+
+Route::get('/blog/{blog:slug}', function(Blog $blog) {
+    // $blog = Blog::find($id);
+    return view('blog', compact('blog'));
+});
+
+Route::get('/category/{category:slug}', function(Category $category) {
+    $blogs =  $category->blogs->load('category', 'author');
+
+    return view('blogs', compact('blogs'));
+});
+
+Route::get('/author/{user:username}', function(User $user) {
+
+    $blogs =  $user->blogs->load('author', 'category');
+
+    return view('blogs', compact('blogs'));
 });
